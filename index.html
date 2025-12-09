@@ -20,13 +20,6 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-        /* Loading spinner animation */
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .spinner {
-            animation: spin 1s linear infinite;
-        }
     </style>
 </head>
 <body class="h-[100dvh] flex flex-col font-sans relative">
@@ -53,7 +46,7 @@
     </div>
 
     <!-- Quick Actions (Quick Taps) -->
-    <div class="bg-gray-900 p-2 grid grid-cols-4 gap-2 shrink-0 border-t border-gray-800">
+    <div class="bg-gray-900 p-2 grid grid-cols-3 gap-2 shrink-0 border-t border-gray-800">
         <button onclick="sendQuickMessage('I am safe.')" class="bg-green-700 hover:bg-green-600 p-2 rounded text-xs font-bold text-center text-white truncate">
             I'm Safe
         </button>
@@ -62,10 +55,6 @@
         </button>
         <button onclick="sendQuickMessage('Call Police!')" class="bg-red-900 hover:bg-red-800 p-2 rounded text-xs font-bold text-center text-red-100 truncate border border-red-700">
             Call 100
-        </button>
-        <!-- AI Help Button -->
-        <button onclick="toggleAIModal()" class="bg-purple-700 hover:bg-purple-600 p-2 rounded text-xs font-bold text-center text-white flex justify-center items-center gap-1 truncate border border-purple-500">
-            ✨ AI Help
         </button>
     </div>
 
@@ -77,41 +66,14 @@
                     type="text" 
                     id="message-input" 
                     placeholder="Type message..." 
-                    class="w-full bg-gray-700 text-white pl-4 pr-10 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 placeholder-gray-400"
+                    class="w-full bg-gray-700 text-white px-4 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 placeholder-gray-400"
                     autocomplete="off"
                 >
-                <!-- Magic Compose Button inside input -->
-                <button type="button" onclick="magicCompose()" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-purple-400 hover:text-purple-200 p-1 rounded-full" title="AI Magic Rewrite">
-                    ✨
-                </button>
             </div>
             <button type="submit" class="bg-red-600 hover:bg-red-500 text-white p-3 rounded-full shadow-lg transition-transform active:scale-95">
                 <i data-lucide="send-horizontal" class="w-6 h-6"></i>
             </button>
         </form>
-    </div>
-
-    <!-- AI Assistant Modal -->
-    <div id="ai-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex justify-center items-end md:items-center">
-        <div class="bg-gray-800 w-full md:w-96 rounded-t-2xl md:rounded-2xl shadow-2xl border-t border-gray-700 p-4 animate-in slide-in-from-bottom duration-300">
-            <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
-                <h2 class="text-purple-400 font-bold flex items-center gap-2">
-                    ✨ AI First Aid & Safety
-                </h2>
-                <button onclick="toggleAIModal()" class="text-gray-400 hover:text-white">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </div>
-            
-            <div id="ai-response-area" class="bg-gray-900 rounded-lg p-3 min-h-[150px] max-h-[300px] overflow-y-auto mb-4 text-sm text-gray-300 leading-relaxed">
-                <p class="opacity-50 italic">Ask me about CPR, burns, panic attacks, or what to do in your specific emergency...</p>
-            </div>
-
-            <form onsubmit="handleAIQuery(event)" class="flex gap-2">
-                <input type="text" id="ai-input" placeholder="e.g., How to stop bleeding?" class="flex-1 bg-gray-700 text-white px-3 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500 text-sm">
-                <button type="submit" class="bg-purple-600 text-white p-2 rounded-lg font-bold text-sm">Ask</button>
-            </form>
-        </div>
     </div>
 
     <!-- Logic -->
@@ -121,7 +83,7 @@
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { createIcons, icons } from "https://esm.sh/lucide@0.263.1";
 
-        // --- 1. FIREBASE CONFIG (Pre-filled from your screenshot) ---
+        // --- 1. FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyDdxISL9HXXqGgIdEpwEI4XtFLUjZz_9e8",
             authDomain: "emergency-1309.firebaseapp.com",
@@ -131,10 +93,6 @@
             appId: "1:354870989012:web:9406562b20ae7569b3eb41"
         };
         // ------------------------------------------
-
-        // --- 2. GEMINI API KEY (Filled) ---
-        const GEMINI_API_KEY = "AIzaSyBe0-dqu8yy7Z-09BnKYAgDAcTL1gG3YUY";
-        // -----------------------------------------
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -150,85 +108,7 @@
         const messageForm = document.getElementById('message-form');
         const messageInput = document.getElementById('message-input');
         
-        // AI UI Elements
-        const aiModal = document.getElementById('ai-modal');
-        const aiResponseArea = document.getElementById('ai-response-area');
-        const aiInput = document.getElementById('ai-input');
-
         createIcons({ icons });
-
-        // --- GEMINI API INTEGRATION ---
-        async function callGemini(prompt, systemInstruction = "") {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-            
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                systemInstruction: { parts: [{ text: systemInstruction }] }
-            };
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) throw new Error('AI Service Unavailable');
-                const data = await response.json();
-                return data.candidates?.[0]?.content?.parts?.[0]?.text || "I couldn't generate a response.";
-            } catch (error) {
-                console.error("Gemini Error:", error);
-                return "Error connecting to AI assistant.";
-            }
-        }
-
-        // Feature 1: Magic Compose
-        window.magicCompose = async () => {
-            const originalText = messageInput.value.trim();
-            if (!originalText) return;
-
-            const originalPlaceholder = messageInput.placeholder;
-            messageInput.value = "";
-            messageInput.placeholder = "✨ Rewriting...";
-            messageInput.disabled = true;
-
-            const systemPrompt = "You are an emergency communication assistant. Rewrite the user's input into a clear, concise, and calm message suitable for an emergency chat. Fix typos and grammar. Do not add conversational filler. Keep it under 2 sentences.";
-            
-            const enhancedText = await callGemini(originalText, systemPrompt);
-            
-            messageInput.value = enhancedText.replace(/^"|"$/g, ''); 
-            messageInput.placeholder = originalPlaceholder;
-            messageInput.disabled = false;
-            messageInput.focus();
-        };
-
-        // Feature 2: AI Assistant Modal Logic
-        window.toggleAIModal = () => {
-            aiModal.classList.toggle('hidden');
-            if (!aiModal.classList.contains('hidden')) {
-                aiInput.focus();
-            }
-        };
-
-        window.handleAIQuery = async (e) => {
-            e.preventDefault();
-            const query = aiInput.value.trim();
-            if (!query) return;
-
-            aiInput.value = "";
-            aiResponseArea.innerHTML = `
-                <div class="flex items-center gap-2 text-purple-400">
-                    <i data-lucide="loader-2" class="w-4 h-4 spinner"></i>
-                    Thinking...
-                </div>`;
-            createIcons({ icons });
-
-            const systemPrompt = "You are an expert First Aid and Emergency Response guide. Provide short, bulleted, actionable steps for the user's emergency. Prioritize safety. Keep the response under 100 words. Do not use markdown formatting like bolding, just plain text or simple bullets.";
-            
-            const response = await callGemini(query, systemPrompt);
-            aiResponseArea.innerHTML = response.replace(/\n/g, '<br>');
-        };
-
 
         // --- FIREBASE LOGIC ---
         async function initApp() {
