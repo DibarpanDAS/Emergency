@@ -33,76 +33,96 @@
     <div class="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-emerald-500/10 rounded-full blur-[80px] pointer-events-none"></div>
     <div class="absolute bottom-[-10%] left-[-10%] w-[300px] h-[300px] bg-indigo-500/10 rounded-full blur-[80px] pointer-events-none"></div>
 
-    <!-- Header -->
-    <div class="glass z-20 px-6 py-4 flex justify-between items-center shrink-0 border-b border-slate-800">
-        <div class="flex items-center gap-3">
-            <div class="bg-emerald-500/10 p-2 rounded-lg border border-emerald-500/20">
-                <i data-lucide="shield" class="w-6 h-6 text-emerald-500"></i>
+    <!-- Connection Screen -->
+    <div id="connection-screen" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 p-6 transition-opacity duration-500">
+        <div class="bg-emerald-500/10 p-6 rounded-full mb-8 animate-pulse">
+            <i data-lucide="shield" class="w-16 h-16 text-emerald-500"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-white mb-2 tracking-tight">Lifeline Link</h1>
+        <p class="text-slate-400 text-center mb-12 max-w-xs">Secure, anonymous emergency channel.</p>
+        
+        <button onclick="startConnection()" class="group relative px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-lg shadow-lg shadow-emerald-900/20 transition-all active:scale-95 w-full max-w-xs overflow-hidden">
+            <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+            <span class="relative flex items-center justify-center gap-2">
+                Connect Securely <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </span>
+        </button>
+        <p id="connection-status" class="mt-6 text-sm text-slate-500 font-mono h-5"></p>
+    </div>
+
+    <!-- Main App (Hidden initially) -->
+    <div id="main-app" class="flex flex-col h-full opacity-0 transition-opacity duration-500 pointer-events-none">
+        <!-- Header -->
+        <div class="glass z-20 px-6 py-4 flex justify-between items-center shrink-0 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+                <div class="bg-emerald-500/10 p-2 rounded-lg border border-emerald-500/20">
+                    <i data-lucide="shield" class="w-6 h-6 text-emerald-500"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight text-white">Lifeline Link</h1>
+                    <div class="flex items-center gap-1.5">
+                        <span id="status-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span id="status-text" class="text-[10px] font-mono text-emerald-400 uppercase tracking-wider">SECURE</span>
+                    </div>
+                </div>
             </div>
-            <div>
-                <h1 class="font-bold text-lg tracking-tight text-white">Lifeline Link</h1>
-                <div class="flex items-center gap-1.5">
-                    <span id="status-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                    <span id="status-text" class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">CONNECTING...</span>
+            <button onclick="location.reload()" class="p-2 hover:bg-white/5 rounded-full text-slate-400 transition-colors">
+                <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- Chat Area -->
+        <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar scroll-smooth z-10">
+            <!-- Empty State -->
+            <div class="flex flex-col items-center justify-center py-20 opacity-50 space-y-4">
+                <div class="bg-slate-800/50 p-4 rounded-full">
+                    <i data-lucide="lock" class="w-8 h-8 text-slate-500"></i>
+                </div>
+                <div class="text-center space-y-1">
+                    <p class="text-sm font-medium text-slate-400">End-to-End Encrypted Channel</p>
+                    <p class="text-xs text-slate-600 max-w-[200px] mx-auto">Messages are secure, anonymous, and vanish when you leave.</p>
                 </div>
             </div>
         </div>
-        <button onclick="location.reload()" class="p-2 hover:bg-white/5 rounded-full text-slate-400 transition-colors">
-            <i data-lucide="refresh-cw" class="w-5 h-5"></i>
-        </button>
-    </div>
 
-    <!-- Chat Area -->
-    <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar scroll-smooth z-10">
-        <!-- Empty State -->
-        <div class="flex flex-col items-center justify-center py-20 opacity-50 space-y-4">
-            <div class="bg-slate-800/50 p-4 rounded-full">
-                <i data-lucide="lock" class="w-8 h-8 text-slate-500"></i>
-            </div>
-            <div class="text-center space-y-1">
-                <p class="text-sm font-medium text-slate-400">End-to-End Encrypted Channel</p>
-                <p class="text-xs text-slate-600 max-w-[200px] mx-auto">Messages are secure, anonymous, and vanish when you leave.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="glass p-3 z-20 grid grid-cols-3 gap-3 shrink-0 border-t border-slate-800/50">
-        <button onclick="sendQuickMessage('I am safe.')" class="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 p-3 rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-2 group active:scale-95">
-            <i data-lucide="check-circle" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
-            I'm Safe
-        </button>
-        <button onclick="sendLocation()" class="bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 p-3 rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-2 group active:scale-95">
-            <i data-lucide="map-pin" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
-            Location
-        </button>
-        <button onclick="sendQuickMessage('Call Police!')" class="bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 p-3 rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-2 group active:scale-95">
-            <i data-lucide="phone-alert" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
-            SOS
-        </button>
-    </div>
-
-    <!-- Input Area -->
-    <div class="bg-slate-900 p-4 pb-safe shrink-0 border-t border-slate-800 z-20">
-        <form id="message-form" class="flex gap-3 relative">
-            <div class="relative flex-1">
-                <input 
-                    type="text" 
-                    id="message-input" 
-                    placeholder="Type a secure message..." 
-                    class="w-full bg-slate-800/50 text-white pl-4 pr-4 py-3.5 rounded-xl border border-slate-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none placeholder-slate-500 transition-all text-sm font-medium"
-                    autocomplete="off"
-                >
-            </div>
-            <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white p-3.5 rounded-xl shadow-lg shadow-emerald-900/20 transition-transform active:scale-95 flex items-center justify-center aspect-square">
-                <i data-lucide="send" class="w-5 h-5"></i>
+        <!-- Quick Actions -->
+        <div class="glass p-3 z-20 grid grid-cols-3 gap-3 shrink-0 border-t border-slate-800/50">
+            <button onclick="sendQuickMessage('I am safe.')" class="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 p-3 rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-2 group active:scale-95">
+                <i data-lucide="check-circle" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                I'm Safe
             </button>
-        </form>
+            <button onclick="sendLocation()" class="bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 p-3 rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-2 group active:scale-95">
+                <i data-lucide="map-pin" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                Location
+            </button>
+            <button onclick="sendQuickMessage('Call Police!')" class="bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 p-3 rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-2 group active:scale-95">
+                <i data-lucide="phone-alert" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                SOS
+            </button>
+        </div>
+
+        <!-- Input Area -->
+        <div class="bg-slate-900 p-4 pb-safe shrink-0 border-t border-slate-800 z-20">
+            <form id="message-form" class="flex gap-3 relative">
+                <div class="relative flex-1">
+                    <input 
+                        type="text" 
+                        id="message-input" 
+                        placeholder="Type a secure message..." 
+                        class="w-full bg-slate-800/50 text-white pl-4 pr-4 py-3.5 rounded-xl border border-slate-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none placeholder-slate-500 transition-all text-sm font-medium"
+                        autocomplete="off"
+                    >
+                </div>
+                <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white p-3.5 rounded-xl shadow-lg shadow-emerald-900/20 transition-transform active:scale-95 flex items-center justify-center aspect-square">
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                </button>
+            </form>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- FIREBASE CONFIG (Verified) ---
@@ -117,6 +137,9 @@
         localStorage.setItem('emergency_device_id', myDeviceId);
 
         // UI Elements
+        const connectionScreen = document.getElementById('connection-screen');
+        const mainApp = document.getElementById('main-app');
+        const connectionStatus = document.getElementById('connection-status');
         const statusText = document.getElementById('status-text');
         const statusDot = document.getElementById('status-dot');
         const chatContainer = document.getElementById('chat-container');
@@ -126,7 +149,15 @@
         // Initialize Icons
         lucide.createIcons();
 
-        async function initApp() {
+        // Expose startConnection to window so the button works
+        window.startConnection = async () => {
+            const btn = document.querySelector('button[onclick="startConnection()"]');
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Connecting...`;
+            lucide.createIcons();
+            
+            connectionStatus.innerText = "Authenticating with Firebase...";
+            
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
@@ -135,17 +166,25 @@
                 }
             } catch (error) {
                 console.error("Auth Error:", error);
-                statusText.innerText = "CONNECTION FAILED";
-                statusDot.classList.replace('bg-amber-500', 'bg-red-500');
-                statusDot.classList.remove('animate-pulse');
+                connectionStatus.innerText = "Connection Failed.";
+                connectionStatus.classList.add('text-red-500');
+                btn.innerHTML = `Retry Connection`;
+                btn.disabled = false;
                 alert("Connection Failed: " + error.message + "\n\nCheck if your AdBlocker is on!");
             }
+        };
+
+        function showMainApp() {
+            connectionScreen.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                connectionScreen.style.display = 'none';
+                mainApp.classList.remove('opacity-0', 'pointer-events-none');
+            }, 500);
         }
 
         function setupRealtimeListener(user) {
-            statusText.innerText = "SECURE CONNECTION";
-            statusDot.classList.replace('bg-amber-500', 'bg-emerald-500');
-            statusDot.classList.remove('animate-pulse'); // Solid green means connected
+            // Once authenticated, switch screens
+            showMainApp();
             
             const messagesRef = collection(db, 'artifacts', appId, 'public', 'data', 'emergency_chat');
             
@@ -260,8 +299,14 @@
         }
 
         messageForm.addEventListener('submit', window.sendMessage);
-        initApp();
-        onAuthStateChanged(auth, (user) => { if (user) setupRealtimeListener(user); });
+        
+        // Only set up listener if ALREADY authenticated (for reloads)
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // If user is already logged in, skip the connection screen
+                setupRealtimeListener(user);
+            }
+        });
     </script>
 </body>
 </html>
