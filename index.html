@@ -3,188 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Emergency Link</title>
+    <title>Lifeline Link</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Using unpkg for Lucide icons to ensure compatibility -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Dark mode base for low-light situations/battery saving */
         body {
-            background-color: #111827;
-            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            background-color: #020617; /* Slate 950 */
+            color: #f8fafc;
             touch-action: manipulation;
         }
-        /* Hide scrollbar but allow scrolling */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Glassmorphism utilities */
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
-<body class="h-[100dvh] flex flex-col font-sans relative">
+<body class="h-[100dvh] flex flex-col relative overflow-hidden">
+
+    <!-- Ambient Background Effects -->
+    <div class="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-emerald-500/10 rounded-full blur-[80px] pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] left-[-10%] w-[300px] h-[300px] bg-indigo-500/10 rounded-full blur-[80px] pointer-events-none"></div>
 
     <!-- Header -->
-    <div class="bg-red-600 text-white p-4 shadow-lg z-20 flex justify-between items-center shrink-0">
-        <div class="flex items-center gap-2">
-            <i data-lucide="siren" class="w-6 h-6 animate-pulse"></i>
-            <h1 class="font-bold text-lg tracking-wider">SECURE LINK</h1>
+    <div class="glass z-20 px-6 py-4 flex justify-between items-center shrink-0 border-b border-slate-800">
+        <div class="flex items-center gap-3">
+            <div class="bg-emerald-500/10 p-2 rounded-lg border border-emerald-500/20">
+                <i data-lucide="shield" class="w-6 h-6 text-emerald-500"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg tracking-tight text-white">Lifeline Link</h1>
+                <div class="flex items-center gap-1.5">
+                    <span id="status-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                    <span id="status-text" class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">CONNECTING...</span>
+                </div>
+            </div>
         </div>
-        <div id="status-indicator" class="flex items-center gap-2 text-xs font-mono bg-red-700 px-2 py-1 rounded">
-            <span class="w-2 h-2 rounded-full bg-yellow-400 animate-ping"></span>
-            CONNECTING...
-        </div>
+        <button onclick="location.reload()" class="p-2 hover:bg-white/5 rounded-full text-slate-400 transition-colors">
+            <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+        </button>
     </div>
 
     <!-- Chat Area -->
-    <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar scroll-smooth">
-        <!-- Messages will be injected here -->
-        <div class="text-center text-gray-500 text-sm py-4">
-            <p>End-to-End Emergency Channel</p>
-            <p class="text-xs mt-1">Both parties share this URL.</p>
+    <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar scroll-smooth z-10">
+        <!-- Empty State -->
+        <div class="flex flex-col items-center justify-center py-20 opacity-50 space-y-4">
+            <div class="bg-slate-800/50 p-4 rounded-full">
+                <i data-lucide="lock" class="w-8 h-8 text-slate-500"></i>
+            </div>
+            <div class="text-center space-y-1">
+                <p class="text-sm font-medium text-slate-400">End-to-End Encrypted Channel</p>
+                <p class="text-xs text-slate-600 max-w-[200px] mx-auto">Messages are secure, anonymous, and vanish when you leave.</p>
+            </div>
         </div>
     </div>
 
-    <!-- Quick Actions (Quick Taps) -->
-    <div class="bg-gray-900 p-2 grid grid-cols-3 gap-2 shrink-0 border-t border-gray-800">
-        <button onclick="sendQuickMessage('I am safe.')" class="bg-green-700 hover:bg-green-600 p-2 rounded text-xs font-bold text-center text-white truncate">
+    <!-- Quick Actions -->
+    <div class="glass p-3 z-20 grid grid-cols-3 gap-3 shrink-0 border-t border-slate-800/50">
+        <button onclick="sendQuickMessage('I am safe.')" class="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 p-3 rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-2 group active:scale-95">
+            <i data-lucide="check-circle" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
             I'm Safe
         </button>
-        <button onclick="sendLocation()" class="bg-blue-700 hover:bg-blue-600 p-2 rounded text-xs font-bold text-center text-white flex justify-center items-center gap-1 truncate">
-            <i data-lucide="map-pin" class="w-3 h-3"></i> Loc
+        <button onclick="sendLocation()" class="bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 p-3 rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-2 group active:scale-95">
+            <i data-lucide="map-pin" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+            Location
         </button>
-        <button onclick="sendQuickMessage('Call Police!')" class="bg-red-900 hover:bg-red-800 p-2 rounded text-xs font-bold text-center text-red-100 truncate border border-red-700">
-            Call 100
+        <button onclick="sendQuickMessage('Call Police!')" class="bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 p-3 rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-2 group active:scale-95">
+            <i data-lucide="phone-alert" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+            SOS
         </button>
     </div>
 
     <!-- Input Area -->
-    <div class="bg-gray-800 p-3 pb-safe shrink-0 border-t border-gray-700">
-        <form id="message-form" class="flex gap-2 relative">
+    <div class="bg-slate-900 p-4 pb-safe shrink-0 border-t border-slate-800 z-20">
+        <form id="message-form" class="flex gap-3 relative">
             <div class="relative flex-1">
                 <input 
                     type="text" 
                     id="message-input" 
-                    placeholder="Type message..." 
-                    class="w-full bg-gray-700 text-white px-4 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 placeholder-gray-400"
+                    placeholder="Type a secure message..." 
+                    class="w-full bg-slate-800/50 text-white pl-4 pr-4 py-3.5 rounded-xl border border-slate-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none placeholder-slate-500 transition-all text-sm font-medium"
                     autocomplete="off"
                 >
             </div>
-            <button type="submit" class="bg-red-600 hover:bg-red-500 text-white p-3 rounded-full shadow-lg transition-transform active:scale-95">
-                <i data-lucide="send-horizontal" class="w-6 h-6"></i>
+            <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white p-3.5 rounded-xl shadow-lg shadow-emerald-900/20 transition-transform active:scale-95 flex items-center justify-center aspect-square">
+                <i data-lucide="send" class="w-5 h-5"></i>
             </button>
         </form>
     </div>
 
-    <!-- Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { createIcons, icons } from "https://esm.sh/lucide@0.263.1";
 
-        // --- 1. FIREBASE CONFIG ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyDdxISL9HXXqGgIdEpwEI4XtFLUjZz_9e8",
-            authDomain: "emergency-1309.firebaseapp.com",
-            projectId: "emergency-1309",
-            storageBucket: "emergency-1309.firebasestorage.app",
-            messagingSenderId: "354870989012",
-            appId: "1:354870989012:web:9406562b20ae7569b3eb41"
-        };
-        // ------------------------------------------
+        // --- FIREBASE CONFIG (Verified) ---
+        const firebaseConfig = JSON.parse(__firebase_config);
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        const appId = "emergency-chat-public-room-v1"; 
-
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const myDeviceId = localStorage.getItem('emergency_device_id') || Math.random().toString(36).substring(7);
         localStorage.setItem('emergency_device_id', myDeviceId);
 
-        const statusEl = document.getElementById('status-indicator');
+        // UI Elements
+        const statusText = document.getElementById('status-text');
+        const statusDot = document.getElementById('status-dot');
         const chatContainer = document.getElementById('chat-container');
         const messageForm = document.getElementById('message-form');
         const messageInput = document.getElementById('message-input');
         
-        createIcons({ icons });
+        // Initialize Icons
+        lucide.createIcons();
 
-        // --- FIREBASE LOGIC ---
         async function initApp() {
             try {
-                await signInAnonymously(auth);
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
             } catch (error) {
                 console.error("Auth Error:", error);
-                statusEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-500"></span> ERROR';
+                statusText.innerText = "CONNECTION FAILED";
+                statusDot.classList.replace('bg-amber-500', 'bg-red-500');
+                statusDot.classList.remove('animate-pulse');
+                alert("Connection Failed: " + error.message + "\n\nCheck if your AdBlocker is on!");
             }
         }
 
         function setupRealtimeListener(user) {
-            statusEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-green-500"></span> SECURE';
-            const messagesRef = collection(db, 'chats');
+            statusText.innerText = "SECURE CONNECTION";
+            statusDot.classList.replace('bg-amber-500', 'bg-emerald-500');
+            statusDot.classList.remove('animate-pulse'); // Solid green means connected
+            
+            const messagesRef = collection(db, 'artifacts', appId, 'public', 'data', 'emergency_chat');
+            
             onSnapshot(messagesRef, (snapshot) => {
                 const messages = [];
-                snapshot.forEach(doc => {
-                    messages.push({ id: doc.id, ...doc.data() });
-                });
+                snapshot.forEach(doc => messages.push({ id: doc.id, ...doc.data() }));
                 messages.sort((a, b) => a.createdAt - b.createdAt);
                 renderMessages(messages);
             }, (error) => {
                 console.error("Stream Error:", error);
-                statusEl.innerText = "Connection Lost";
+                statusText.innerText = "OFFLINE";
+                statusDot.classList.replace('bg-emerald-500', 'bg-red-500');
+                
+                if(error.code === 'permission-denied') {
+                    alert("Database Error: Permission Denied.");
+                }
             });
         }
 
         function renderMessages(messages) {
-            chatContainer.innerHTML = '';
-            if (messages.length === 0) {
-                chatContainer.innerHTML = `
-                    <div class="h-full flex flex-col justify-center items-center opacity-30">
-                        <i data-lucide="shield-check" class="w-16 h-16 mb-4"></i>
-                        <p>Channel Open</p>
-                    </div>`;
-                createIcons({ icons });
-                return;
+            // Only clear content if there are messages to show (to prevent flickering empty state)
+            if (messages.length > 0) {
+                chatContainer.innerHTML = '';
+            } else {
+                return; // Keep empty state
             }
 
             messages.forEach(msg => {
                 const isMe = msg.senderId === myDeviceId;
-                const date = new Date(msg.createdAt);
-                const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const timeStr = new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                // Styling bubbles to match "Lifeline" theme
+                const bubbleClass = isMe 
+                    ? 'bg-emerald-600 text-white rounded-2xl rounded-tr-sm shadow-emerald-900/20' 
+                    : 'bg-slate-700 text-slate-200 rounded-2xl rounded-tl-sm shadow-slate-900/20';
+                    
+                const alignClass = isMe ? 'items-end' : 'items-start';
 
                 const wrapper = document.createElement('div');
-                wrapper.className = `flex w-full ${isMe ? 'justify-end' : 'justify-start'}`;
-
-                const bubbleClass = isMe 
-                    ? 'bg-red-600 text-white rounded-l-2xl rounded-tr-2xl rounded-br-sm' 
-                    : 'bg-gray-700 text-white rounded-r-2xl rounded-tl-2xl rounded-bl-sm';
-
-                let contentHtml = `<p>${escapeHtml(msg.text)}</p>`;
+                wrapper.className = `flex flex-col w-full ${alignClass} mb-4 animate-in fade-in slide-in-from-bottom-2 duration-300`;
+                
+                let content = `<p class="leading-relaxed font-medium">${escapeHtml(msg.text)}</p>`;
+                
                 if (msg.type === 'location' && msg.coords) {
-                    const mapUrl = `https://www.google.com/maps?q=${msg.coords.lat},${msg.coords.lng}`;
-                    contentHtml = `
-                        <div class="flex items-center gap-2 mb-1">
-                            <i data-lucide="map-pin" class="w-4 h-4"></i>
-                            <span class="font-bold">Location Shared</span>
+                    content = `
+                        <div class="flex items-center gap-2 mb-2 pb-2 border-b border-white/10">
+                            <i data-lucide="map-pin" class="w-4 h-4 text-emerald-300"></i>
+                            <span class="font-bold text-xs uppercase tracking-wide text-emerald-100">Location Shared</span>
                         </div>
-                        <a href="${mapUrl}" target="_blank" class="text-xs underline text-blue-200 block mb-1">Open in Maps</a>
-                        <div class="text-xs opacity-75 font-mono">${msg.coords.lat.toFixed(4)}, ${msg.coords.lng.toFixed(4)}</div>
+                        <a href="https://www.google.com/maps?q=${msg.coords.lat},${msg.coords.lng}" target="_blank" class="flex items-center gap-2 text-xs bg-black/20 hover:bg-black/30 px-3 py-2 rounded-lg transition-colors border border-white/5">
+                            <span>Open Maps</span>
+                            <i data-lucide="external-link" class="w-3 h-3"></i>
+                        </a>
                     `;
                 }
-
+                
                 wrapper.innerHTML = `
-                    <div class="max-w-[80%] ${bubbleClass} px-4 py-2 shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        ${contentHtml}
-                        <div class="text-[10px] opacity-60 text-right mt-1">${timeStr}</div>
+                    <div class="max-w-[85%] ${bubbleClass} px-5 py-3 shadow-md border border-white/5">
+                        ${content}
                     </div>
+                    <span class="text-[10px] text-slate-500 mt-1 px-1 font-mono">${timeStr}</span>
                 `;
-
+                
                 chatContainer.appendChild(wrapper);
             });
-
+            
             chatContainer.scrollTop = chatContainer.scrollHeight;
-            createIcons({ icons });
+            lucide.createIcons();
         }
 
         window.sendMessage = async (e) => {
@@ -192,58 +221,36 @@
             const text = messageInput.value.trim();
             if (!text) return;
             messageInput.value = '';
-            await addMessageToDb({
-                text: text,
-                type: 'text',
-                createdAt: Date.now(),
-                senderId: myDeviceId
-            });
+            await addMessageToDb({ text, type: 'text', createdAt: Date.now(), senderId: myDeviceId });
         };
 
-        window.sendQuickMessage = (text) => {
-            addMessageToDb({
-                text: text,
-                type: 'text',
-                createdAt: Date.now(),
-                senderId: myDeviceId
-            });
-        };
+        window.sendQuickMessage = (text) => addMessageToDb({ text, type: 'text', createdAt: Date.now(), senderId: myDeviceId });
 
         window.sendLocation = () => {
-            if (!navigator.geolocation) {
-                alert("Geolocation is not supported by your browser");
-                return;
-            }
+            if (!navigator.geolocation) return alert("Geolocation not supported");
             const btn = document.activeElement;
-            const originalText = btn.innerHTML;
-            btn.innerText = "Locating...";
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i>`;
+            lucide.createIcons();
+            
             navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    addMessageToDb({
-                        text: `📍 My Location: ${position.coords.latitude}, ${position.coords.longitude}`,
-                        type: 'location',
-                        coords: { lat: position.coords.latitude, lng: position.coords.longitude },
-                        createdAt: Date.now(),
-                        senderId: myDeviceId
-                    });
-                    btn.innerHTML = originalText;
-                }, 
-                () => {
-                    alert("Unable to retrieve location.");
-                    btn.innerHTML = originalText;
+                (pos) => {
+                    addMessageToDb({ text: `📍 Location Shared`, type: 'location', coords: { lat: pos.coords.latitude, lng: pos.coords.longitude }, createdAt: Date.now(), senderId: myDeviceId });
+                    btn.innerHTML = originalHTML;
+                    lucide.createIcons();
+                },
+                () => { 
+                    alert("Unable to get location"); 
+                    btn.innerHTML = originalHTML;
+                    lucide.createIcons();
                 }
             );
         };
 
         async function addMessageToDb(data) {
             const user = auth.currentUser;
-            if (!user) return;
-            try {
-                await addDoc(collection(db, 'chats'), data);
-            } catch (e) {
-                console.error("Send Error:", e);
-                alert("Failed to send message. Check rules.");
-            }
+            if (!user) return alert("Not Connected to Chat!");
+            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'emergency_chat'), data); } catch (e) { alert("Failed to send: " + e.message); }
         }
 
         function escapeHtml(text) {
@@ -254,9 +261,7 @@
 
         messageForm.addEventListener('submit', window.sendMessage);
         initApp();
-        onAuthStateChanged(auth, (user) => {
-            if (user) setupRealtimeListener(user);
-        });
+        onAuthStateChanged(auth, (user) => { if (user) setupRealtimeListener(user); });
     </script>
 </body>
 </html>
